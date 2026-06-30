@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — HELIXA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+      <path class="strand" d="M9 4 L23 14 L9 18 L23 28"/>
+    </svg>
+    HELIXA
+  </a>
+  <div class="nav-actions">
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="menu-btn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="drawer-overlay"></div>
+<aside class="drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <span class="brand" style="font-size:1.05rem;">Menu</span>
+    <button class="drawer-close" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="subject-teacher.html" class="drawer-link" data-page="subject"><span class="num">01</span>Subject Teacher</a>
+    <a href="class-teacher.html" class="drawer-link" data-page="class"><span class="num">02</span>Class Teacher</a>
+    <a href="history.html" class="drawer-link" data-page="history"><span class="num">03</span>History</a>
+    <a href="settings.html" class="drawer-link" data-page="settings"><span class="num">04</span>Settings</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="eyebrow">04 / Settings</div>
+      <h1>Preferences</h1>
+    </div>
+
+    <div class="settings-group">
+      <h2>Score structure</h2>
+      <p class="group-hint">Applies to every Subject Teacher sheet, school-wide.</p>
+      <div class="form-grid form-grid-3">
+        <div class="field">
+          <label for="ca1Max">CA1 max</label>
+          <input type="number" id="ca1Max" min="1">
+        </div>
+        <div class="field">
+          <label for="ca2Max">CA2 max</label>
+          <input type="number" id="ca2Max" min="1">
+        </div>
+        <div class="field">
+          <label for="examMax">Exam max</label>
+          <input type="number" id="examMax" min="1">
+        </div>
+      </div>
+      <p class="field-error show" id="structureError" style="display:none;"></p>
+      <button class="btn btn-secondary btn-sm" id="saveStructureBtn">Save score structure</button>
+    </div>
+
+    <div class="settings-group">
+      <h2>Grade boundaries</h2>
+      <p class="group-hint">Used for remarks and the performance pie chart. Ranges must not overlap.</p>
+      <div id="boundaryList"></div>
+      <p class="field-error show" id="boundaryError" style="display:none;"></p>
+      <button class="btn btn-secondary btn-sm" id="saveBoundariesBtn">Save grade boundaries</button>
+    </div>
+
+    <div class="settings-group">
+      <h2>General</h2>
+      <div class="switch-row">
+        <div class="switch-row-text">
+          <strong>Auto-save</strong>
+          <span>Automatically save progress as you type</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="autoSaveToggle">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h2>Data</h2>
+      <p class="group-hint">Clearing history removes every saved Subject and Class result from this device. This cannot be undone.</p>
+      <button class="btn btn-danger btn-sm" id="clearHistoryBtn">Clear all history</button>
+      <button class="btn btn-ghost btn-sm" id="resetDefaultsBtn" style="margin-left:10px;">Reset settings to default</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="page-wrap">
+    <span>HELIXA</span>
+    <span>Local-first &middot; No account needed</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+HELIXA.initChrome('settings');
+
+let settings = HELIXA.getSettings();
+
+function loadStructureForm() {
+  document.getElementById('ca1Max').value = settings.scoreStructure.ca1Max;
+  document.getElementById('ca2Max').value = settings.scoreStructure.ca2Max;
+  document.getElementById('examMax').value = settings.scoreStructure.examMax;
+}
+
+function loadBoundaries() {
+  const list = document.getElementById('boundaryList');
+  list.innerHTML = settings.gradeBoundaries.map((b, i) => `
+    <div class="boundary-row">
+      <span style="font-family:var(--font-display); font-weight:600; font-size:0.9rem;">${b.label}</span>
+      <input type="number" data-idx="${i}" data-field="min" value="${b.min}" aria-label="${b.label} minimum">
+      <input type="number" data-idx="${i}" data-field="max" value="${b.max}" aria-label="${b.label} maximum">
+      <span class="swatch" style="background:${b.color};"></span>
+    </div>
+  `).join('');
+}
+
+function loadGeneral() {
+  document.getElementById('autoSaveToggle').checked = !!settings.autoSave;
+}
+
+loadStructureForm();
+loadBoundaries();
+loadGeneral();
+
+document.getElementById('saveStructureBtn').addEventListener('click', () => {
+  const ca1Max = Number(document.getElementById('ca1Max').value);
+  const ca2Max = Number(document.getElementById('ca2Max').value);
+  const examMax = Number(document.getElementById('examMax').value);
+  const errEl = document.getElementById('structureError');
+
+  if ([ca1Max, ca2Max, examMax].some(v => isNaN(v) || v <= 0)) {
+    errEl.textContent = 'All max scores must be positive numbers';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  settings.scoreStructure = { ca1Max, ca2Max, examMax };
+  HELIXA.saveSettings(settings);
+  HELIXA.showToast('Score structure saved', 'success');
+});
+
+document.getElementById('saveBoundariesBtn').addEventListener('click', () => {
+  const rows = Array.from(document.querySelectorAll('#boundaryList .boundary-row'));
+  const errEl = document.getElementById('boundaryError');
+  const updated = settings.gradeBoundaries.map((b, i) => {
+    const minInput = document.querySelector(`[data-idx="${i}"][data-field="min"]`);
+    const maxInput = document.querySelector(`[data-idx="${i}"][data-field="max"]`);
+    return { ...b, min: Number(minInput.value), max: Number(maxInput.value) };
+  });
+
+  const invalid = updated.some(b => isNaN(b.min) || isNaN(b.max) || b.min > b.max);
+  if (invalid) {
+    errEl.textContent = 'Each minimum must be less than or equal to its maximum';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // sort descending by min to check for overlaps/gaps loosely (not strictly enforced, just warn)
+  errEl.style.display = 'none';
+  settings.gradeBoundaries = updated;
+  HELIXA.saveSettings(settings);
+  HELIXA.showToast('Grade boundaries saved', 'success');
+});
+
+document.getElementById('autoSaveToggle').addEventListener('change', (e) => {
+  settings.autoSave = e.target.checked;
+  HELIXA.saveSettings(settings);
+  HELIXA.showToast(settings.autoSave ? 'Auto-save turned on' : 'Auto-save turned off');
+});
+
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+  if (confirm('This will permanently delete every saved Subject and Class result on this device. Continue?')) {
+    HELIXA.clearAllRecords();
+    HELIXA.showToast('All history cleared', 'success');
+  }
+});
+
+document.getElementById('resetDefaultsBtn').addEventListener('click', () => {
+  if (confirm('Reset score structure and grade boundaries to HELIXA defaults?')) {
+    settings = HELIXA.resetSettings();
+    loadStructureForm();
+    loadBoundaries();
+    loadGeneral();
+    HELIXA.showToast('Settings reset to default', 'success');
+  }
+});
+</script>
+</body>
+</html>

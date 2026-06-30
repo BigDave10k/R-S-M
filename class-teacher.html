@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Teacher — HELIXA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+      <path class="strand" d="M9 4 L23 14 L9 18 L23 28"/>
+    </svg>
+    HELIXA
+  </a>
+  <div class="nav-actions">
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="menu-btn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="drawer-overlay"></div>
+<aside class="drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <span class="brand" style="font-size:1.05rem;">Menu</span>
+    <button class="drawer-close" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="subject-teacher.html" class="drawer-link" data-page="subject"><span class="num">01</span>Subject Teacher</a>
+    <a href="class-teacher.html" class="drawer-link" data-page="class"><span class="num">02</span>Class Teacher</a>
+    <a href="history.html" class="drawer-link" data-page="history"><span class="num">03</span>History</a>
+    <a href="settings.html" class="drawer-link" data-page="settings"><span class="num">04</span>Settings</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="eyebrow">02 / Class Teacher</div>
+      <h1>Build the broadsheet</h1>
+    </div>
+
+    <div class="card mb-24" id="setup-card">
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label for="className">Class name</label>
+          <input type="text" id="className" placeholder="e.g. JSS2A" autocomplete="off">
+          <span class="field-error" id="err-className">Class name is required</span>
+        </div>
+        <div class="field">
+          <label for="numStudents">Number of students</label>
+          <input type="number" id="numStudents" min="1" placeholder="e.g. 40">
+          <span class="field-error" id="err-numStudents">Enter a valid number above 0</span>
+        </div>
+      </div>
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label for="session">Session</label>
+          <input type="text" id="session" placeholder="e.g. 2025/2026" autocomplete="off">
+          <span class="field-error" id="err-session">Session is required</span>
+        </div>
+        <div class="field">
+          <label for="term">Term</label>
+          <select id="term">
+            <option value="">Select term</option>
+            <option value="First Term">First Term</option>
+            <option value="Second Term">Second Term</option>
+            <option value="Third Term">Third Term</option>
+          </select>
+          <span class="field-error" id="err-term">Term is required</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="findImportsBtn">Find subject results</button>
+        <button class="btn btn-secondary" id="generateBtn">Build manually instead</button>
+      </div>
+    </div>
+
+    <div class="card mb-24" id="import-card" style="display:none;">
+      <h2 style="font-size:1.05rem; margin-bottom:6px;">Subjects found for this class</h2>
+      <p class="text-secondary" style="font-size:0.85rem; margin-bottom:16px;">Select the subjects to pull into the broadsheet. Each student's saved <strong>total</strong> for that subject will be imported.</p>
+      <div id="import-list"></div>
+      <div class="btn-row mt-24">
+        <button class="btn btn-primary" id="importBtn">Import selected</button>
+      </div>
+    </div>
+
+    <div id="manual-subjects-card" class="card mb-24" style="display:none;">
+      <h2 style="font-size:1.05rem; margin-bottom:6px;">Subject columns</h2>
+      <p class="text-secondary" style="font-size:0.85rem; margin-bottom:16px;">Add the subjects this class takes. You'll enter each student's total per subject.</p>
+      <div class="btn-row" style="margin-bottom:14px;" id="subject-chip-row"></div>
+      <div class="form-grid form-grid-2" style="align-items:end;">
+        <div class="field" style="margin-bottom:0;">
+          <label for="newSubjectName">Subject name</label>
+          <input type="text" id="newSubjectName" placeholder="e.g. Mathematics">
+        </div>
+        <button class="btn btn-secondary" id="addSubjectBtn" style="margin-bottom:16px;">Add subject</button>
+      </div>
+      <div class="btn-row mt-24">
+        <button class="btn btn-primary" id="buildManualBtn">Build table</button>
+      </div>
+    </div>
+
+    <div id="table-section" style="display:none;">
+      <div class="flex-between mb-24">
+        <h2 style="font-size:1.1rem;">Broadsheet</h2>
+        <span class="text-secondary" id="table-meta" style="font-size:0.85rem;"></span>
+      </div>
+
+      <div class="table-scroll mb-24">
+        <table class="results" id="scoreTable">
+          <thead>
+            <tr id="theadRow">
+              <th>S/No</th>
+              <th>Student Name</th>
+              <!-- subject columns injected here -->
+              <th>Total</th>
+              <th>Average</th>
+              <th>Position</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="btn-row mb-24">
+        <button class="btn btn-primary" id="computeBtn">Compute</button>
+        <button class="btn btn-secondary" id="saveBtn">Save</button>
+        <button class="btn btn-ghost" id="resetBtn">Reset</button>
+      </div>
+
+      <div id="summary-section" style="display:none;">
+        <div class="stat-grid mb-24">
+          <div class="stat-card">
+            <span class="stat-value" id="stat-total">—</span>
+            <span class="stat-label">Total Students</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-passed">—</span>
+            <span class="stat-label">Passed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-failed">—</span>
+            <span class="stat-label">Failed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-highest">—</span>
+            <span class="stat-label">Highest Average</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-lowest">—</span>
+            <span class="stat-label">Lowest Average</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-classAvg">—</span>
+            <span class="stat-label">Class Average</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size:1.05rem; margin-bottom:16px;">Performance breakdown</h2>
+          <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:center;">
+            <svg id="pieChart" width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Performance breakdown pie chart"></svg>
+            <div id="pieLegend" style="display:flex; flex-direction:column; gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="page-wrap">
+    <span>HELIXA</span>
+    <span>Local-first &middot; No account needed</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+HELIXA.initChrome('class');
+
+const settings = HELIXA.getSettings();
+let currentRecord = null;
+let subjectColumns = []; // array of subject name strings
+let importedTotals = null; // { subjectName: [{name, total}, ...] } when using import flow
+
+const els = {
+  className: document.getElementById('className'),
+  numStudents: document.getElementById('numStudents'),
+  session: document.getElementById('session'),
+  term: document.getElementById('term'),
+  findImportsBtn: document.getElementById('findImportsBtn'),
+  generateBtn: document.getElementById('generateBtn'),
+  importCard: document.getElementById('import-card'),
+  importList: document.getElementById('import-list'),
+  importBtn: document.getElementById('importBtn'),
+  manualSubjectsCard: document.getElementById('manual-subjects-card'),
+  subjectChipRow: document.getElementById('subject-chip-row'),
+  newSubjectName: document.getElementById('newSubjectName'),
+  addSubjectBtn: document.getElementById('addSubjectBtn'),
+  buildManualBtn: document.getElementById('buildManualBtn'),
+  tableSection: document.getElementById('table-section'),
+  theadRow: document.getElementById('theadRow'),
+  tableBody: document.getElementById('tableBody'),
+  tableMeta: document.getElementById('table-meta'),
+  computeBtn: document.getElementById('computeBtn'),
+  saveBtn: document.getElementById('saveBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  summarySection: document.getElementById('summary-section')
+};
+
+function clearFieldError(id) {
+  const input = document.getElementById(id);
+  const err = document.getElementById('err-' + id);
+  if (input) input.classList.remove('invalid');
+  if (err) err.classList.remove('show');
+}
+function setFieldError(id) {
+  const input = document.getElementById(id);
+  const err = document.getElementById('err-' + id);
+  if (input) input.classList.add('invalid');
+  if (err) err.classList.add('show');
+}
+
+function validateSetup() {
+  let valid = true;
+  ['className', 'session'].forEach(id => {
+    clearFieldError(id);
+    if (!HELIXA.validateRequired(els[id].value)) { setFieldError(id); valid = false; }
+  });
+  clearFieldError('term');
+  if (!HELIXA.validateRequired(els.term.value)) { setFieldError('term'); valid = false; }
+  clearFieldError('numStudents');
+  const n = Number(els.numStudents.value);
+  if (!HELIXA.validateRequired(els.numStudents.value) || isNaN(n) || n <= 0 || !Number.isInteger(n)) {
+    setFieldError('numStudents'); valid = false;
+  }
+  return valid;
+}
+
+// ---- Import flow ----
+
+els.findImportsBtn.addEventListener('click', () => {
+  if (!validateSetup()) { HELIXA.showToast('Please fix the highlighted fields', 'error'); return; }
+  const matches = HELIXA.findSubjectRecords(els.className.value.trim(), els.session.value.trim(), els.term.value);
+  els.manualSubjectsCard.style.display = 'none';
+  if (!matches.length) {
+    els.importCard.style.display = 'block';
+    els.importList.innerHTML = `<div class="empty-state"><h3>No saved subject results found</h3><p>Nothing matches ${els.className.value.trim()} · ${els.session.value.trim()} · ${els.term.value} yet. Ask subject teachers to save their results first, or build the broadsheet manually.</p></div>`;
+    els.importBtn.style.display = 'none';
+    return;
+  }
+  els.importBtn.style.display = 'inline-flex';
+  els.importList.innerHTML = matches.map(rec => `
+    <label class="switch-row" style="cursor:pointer;">
+      <span class="switch-row-text">
+        <strong>${rec.subjectName}</strong>
+        <span>${rec.students.length} students · saved ${HELIXA.formatDate(rec.updatedAt)}</span>
+      </span>
+      <input type="checkbox" class="import-check" data-record-id="${rec.id}" checked style="width:20px;height:20px;">
+    </label>
+  `).join('');
+  els.importCard.style.display = 'block';
+  els.importCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+els.importBtn.addEventListener('click', () => {
+  const checked = Array.from(document.querySelectorAll('.import-check:checked'));
+  if (!checked.length) { HELIXA.showToast('Select at least one subject', 'error'); return; }
+
+  const records = checked.map(c => HELIXA.getRecord(c.dataset.recordId));
+  subjectColumns = records.map(r => r.subjectName);
+
+  // Union of all student names across imported subjects, preserving first-seen order
+  const nameOrder = [];
+  const studentMap = {}; // name -> { subjectName: total }
+  records.forEach(rec => {
+    rec.students.forEach(s => {
+      const key = s.name && s.name.trim() ? s.name.trim() : `S/No ${s.sno} (${rec.subjectName})`;
+      if (!studentMap[key]) { studentMap[key] = {}; nameOrder.push(key); }
+      studentMap[key][rec.subjectName] = s.total;
+    });
+  });
+
+  importedTotals = { nameOrder, studentMap };
+  els.numStudents.value = nameOrder.length;
+  buildTable(subjectColumns, nameOrder, studentMap);
+  HELIXA.showToast(`Imported ${subjectColumns.length} subject${subjectColumns.length > 1 ? 's' : ''}`, 'success');
+});
+
+// ---- Manual flow ----
+
+els.generateBtn.addEventListener('click', () => {
+  if (!validateSetup()) { HELIXA.showToast('Please fix the highlighted fields', 'error'); return; }
+  els.importCard.style.display = 'none';
+  els.manualSubjectsCard.style.display = 'block';
+  els.manualSubjectsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+function renderSubjectChips() {
+  els.subjectChipRow.innerHTML = subjectColumns.map((s, i) => `
+    <span class="badge badge-verygood" style="display:inline-flex; align-items:center; gap:6px;">
+      ${s} <button type="button" data-idx="${i}" class="remove-subject" style="background:none;border:none;color:inherit;cursor:pointer;font-weight:700;">&times;</button>
+    </span>
+  `).join('') || '<span class="text-secondary" style="font-size:0.85rem;">No subjects added yet</span>';
+
+  els.subjectChipRow.querySelectorAll('.remove-subject').forEach(btn => {
+    btn.addEventListener('click', () => {
+      subjectColumns.splice(Number(btn.dataset.idx), 1);
+      renderSubjectChips();
+    });
+  });
+}
+
+els.addSubjectBtn.addEventListener('click', () => {
+  const name = els.newSubjectName.value.trim();
+  if (!name) { HELIXA.showToast('Enter a subject name', 'error'); return; }
+  if (subjectColumns.includes(name)) { HELIXA.showToast('Subject already added', 'error'); return; }
+  subjectColumns.push(name);
+  els.newSubjectName.value = '';
+  renderSubjectChips();
+});
+
+els.buildManualBtn.addEventListener('click', () => {
+  if (!subjectColumns.length) { HELIXA.showToast('Add at least one subject', 'error'); return; }
+  importedTotals = null;
+  buildTable(subjectColumns, null, null);
+});
+
+// ---- Table building ----
+
+function buildTable(subjects, nameOrder, studentMap) {
+  // header
+  const subjectHeaders = subjects.map(s => `<th data-subject="${s}">${s}</th>`).join('');
+  els.theadRow.innerHTML = `<th>S/No</th><th>Student Name</th>${subjectHeaders}<th>Total</th><th>Average</th><th>Position</th>`;
+
+  const n = Number(els.numStudents.value);
+  els.tableBody.innerHTML = '';
+
+  for (let i = 0; i < n; i++) {
+    const tr = document.createElement('tr');
+    const name = nameOrder ? nameOrder[i] : '';
+    const subjectCells = subjects.map(s => {
+      const val = studentMap && nameOrder ? (studentMap[nameOrder[i]][s] ?? '') : '';
+      return `<td class="${importedTotals ? 'imported-col' : ''}"><input type="number" data-subject="${s}" min="0" value="${val}" placeholder="0"></td>`;
+    }).join('');
+    tr.innerHTML = `
+      <td class="sno-cell">${i + 1}</td>
+      <td><input type="text" class="name-input" data-field="name" value="${name}" placeholder="Student ${i + 1}"></td>
+      ${subjectCells}
+      <td class="col-total" data-field="total">—</td>
+      <td data-field="average">—</td>
+      <td class="col-position" data-field="position">—</td>
+    `;
+    els.tableBody.appendChild(tr);
+  }
+
+  els.tableMeta.textContent = `${els.className.value} · ${els.session.value} · ${els.term.value} · ${subjects.length} subjects`;
+  els.tableSection.style.display = 'block';
+  els.summarySection.style.display = 'none';
+  els.tableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- Compute ----
+
+function compute() {
+  const rows = Array.from(els.tableBody.querySelectorAll('tr'));
+  let allValid = true;
+  const data = [];
+
+  rows.forEach(tr => {
+    const name = tr.querySelector('[data-field="name"]').value;
+    const subjectInputs = Array.from(tr.querySelectorAll('input[data-subject]'));
+    let rowTotal = 0;
+    subjectInputs.forEach(input => {
+      const result = HELIXA.validateScore(input.value, 100000); // class teacher totals aren't capped by CA/exam max
+      if (!result.valid || Number(input.value) < 0) {
+        input.classList.add('invalid');
+        allValid = false;
+      } else {
+        input.classList.remove('invalid');
+        rowTotal += Number(input.value);
+      }
+    });
+    data.push({ tr, name, rowTotal, subjectCount: subjectInputs.length });
+  });
+
+  if (!allValid) {
+    HELIXA.showToast('Some scores are invalid — check highlighted cells', 'error');
+    return null;
+  }
+
+  const ranks = HELIXA.computeRanks(data, 'rowTotal');
+  data.forEach((d, i) => {
+    const avg = d.rowTotal / d.subjectCount;
+    d.average = avg;
+    d.tr.querySelector('[data-field="total"]').textContent = d.rowTotal;
+    d.tr.querySelector('[data-field="average"]').textContent = avg.toFixed(1);
+    d.tr.querySelector('[data-field="position"]').textContent = ordinal(ranks[i]);
+  });
+
+  renderSummary(data);
+  return data;
+}
+
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function renderSummary(data) {
+  const boundaries = settings.gradeBoundaries;
+  const averages = data.map(d => d.average);
+  const total = data.length;
+
+  const failBoundary = boundaries.find(b => b.label === 'Fail');
+  const failCutoff = failBoundary ? failBoundary.max : 39;
+  const passed = averages.filter(a => a > failCutoff).length;
+  const failed = total - passed;
+  const classAvg = averages.reduce((a, b) => a + b, 0) / total;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-passed').textContent = passed;
+  document.getElementById('stat-failed').textContent = failed;
+  document.getElementById('stat-highest').textContent = Math.max(...averages).toFixed(1);
+  document.getElementById('stat-lowest').textContent = Math.min(...averages).toFixed(1);
+  document.getElementById('stat-classAvg').textContent = classAvg.toFixed(1);
+
+  // grade distribution
+  const counts = {};
+  boundaries.forEach(b => counts[b.label] = 0);
+  averages.forEach(avg => {
+    const grade = HELIXA.getGradeForScore(avg, boundaries);
+    counts[grade.label] = (counts[grade.label] || 0) + 1;
+  });
+
+  drawPieChart(counts, boundaries);
+  els.summarySection.style.display = 'block';
+}
+
+function drawPieChart(counts, boundaries) {
+  const svg = document.getElementById('pieChart');
+  const legend = document.getElementById('pieLegend');
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const cx = 90, cy = 90, r = 80;
+
+  if (total === 0) { svg.innerHTML = ''; legend.innerHTML = ''; return; }
+
+  let startAngle = -90;
+  let paths = '';
+  let legendHtml = '';
+
+  boundaries.forEach(b => {
+    const count = counts[b.label] || 0;
+    if (count === 0) return;
+    const angle = (count / total) * 360;
+    const endAngle = startAngle + angle;
+    const largeArc = angle > 180 ? 1 : 0;
+
+    const x1 = cx + r * Math.cos(startAngle * Math.PI / 180);
+    const y1 = cy + r * Math.sin(startAngle * Math.PI / 180);
+    const x2 = cx + r * Math.cos(endAngle * Math.PI / 180);
+    const y2 = cy + r * Math.sin(endAngle * Math.PI / 180);
+
+    if (count === total) {
+      paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${b.color}"/>`;
+    } else {
+      paths += `<path d="M${cx},${cy} L

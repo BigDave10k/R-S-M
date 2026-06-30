@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History — HELIXA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+      <path class="strand" d="M9 4 L23 14 L9 18 L23 28"/>
+    </svg>
+    HELIXA
+  </a>
+  <div class="nav-actions">
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="menu-btn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="drawer-overlay"></div>
+<aside class="drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <span class="brand" style="font-size:1.05rem;">Menu</span>
+    <button class="drawer-close" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="subject-teacher.html" class="drawer-link" data-page="subject"><span class="num">01</span>Subject Teacher</a>
+    <a href="class-teacher.html" class="drawer-link" data-page="class"><span class="num">02</span>Class Teacher</a>
+    <a href="history.html" class="drawer-link" data-page="history"><span class="num">03</span>History</a>
+    <a href="settings.html" class="drawer-link" data-page="settings"><span class="num">04</span>Settings</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="page-wrap">
+    <div class="page-header">
+      <div class="eyebrow">03 / History</div>
+      <h1>Saved computations</h1>
+    </div>
+
+    <div id="historyList"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="page-wrap">
+    <span>HELIXA</span>
+    <span>Local-first &middot; No account needed</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+HELIXA.initChrome('history');
+
+function render() {
+  const records = HELIXA.getRecords().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const list = document.getElementById('historyList');
+
+  if (!records.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <h3>No saved results yet</h3>
+        <p>Computations you save from Subject Teacher or Class Teacher will show up here, and you can resume editing any time.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = records.map(r => {
+    const title = r.type === 'subject' ? `${r.className} — ${r.subjectName}` : `${r.className} — Class Result`;
+    const link = r.type === 'subject' ? `subject-teacher.html?load=${r.id}` : `class-teacher.html?load=${r.id}`;
+    return `
+      <div class="history-item">
+        <div class="history-item-info">
+          <div class="history-item-title">
+            <span class="history-type-tag">${r.type === 'subject' ? 'Subject' : 'Class'}</span>
+            ${title}
+          </div>
+          <div class="history-item-meta">${r.session} · ${r.term} · ${r.students.length} students · updated ${HELIXA.formatDate(r.updatedAt)}</div>
+        </div>
+        <div class="history-item-actions">
+          <a href="${link}" class="btn btn-secondary btn-sm">Resume</a>
+          <button class="btn btn-danger btn-sm" data-delete="${r.id}">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  list.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Delete this saved record? This cannot be undone.')) {
+        HELIXA.deleteRecord(btn.dataset.delete);
+        HELIXA.showToast('Record deleted');
+        render();
+      }
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>

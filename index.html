@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HELIXA — Result Computing for Teachers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+      <path class="strand" d="M9 4 L23 14 L9 18 L23 28"/>
+    </svg>
+    HELIXA
+  </a>
+  <div class="nav-actions">
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="menu-btn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="drawer-overlay"></div>
+<aside class="drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <span class="brand" style="font-size:1.05rem;">Menu</span>
+    <button class="drawer-close" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="subject-teacher.html" class="drawer-link" data-page="subject"><span class="num">01</span>Subject Teacher</a>
+    <a href="class-teacher.html" class="drawer-link" data-page="class"><span class="num">02</span>Class Teacher</a>
+    <a href="history.html" class="drawer-link" data-page="history"><span class="num">03</span>History</a>
+    <a href="settings.html" class="drawer-link" data-page="settings"><span class="num">04</span>Settings</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="page-wrap">
+    <section class="hero">
+      <div class="hero-eyebrow">Built for Nigerian secondary schools</div>
+      <h1>Compute results.<br>Not <span class="accent">stress</span>.</h1>
+      <p class="lead">HELIXA handles the arithmetic, ranking, and aggregation behind every broadsheet — so subject scores become class results in minutes, not evenings.</p>
+      <div class="btn-row">
+        <a href="subject-teacher.html" class="btn btn-primary">Start as Subject Teacher</a>
+        <a href="class-teacher.html" class="btn btn-secondary">Start as Class Teacher</a>
+      </div>
+
+      <div class="role-grid">
+        <a href="subject-teacher.html" class="role-card reveal">
+          <span class="role-num">01 / Subject</span>
+          <h3>Subject Teacher</h3>
+          <p>Enter CA1, CA2 and Exam scores for your class. HELIXA totals, ranks, and flags errors as you go.</p>
+          <span class="role-arrow">&rarr;</span>
+        </a>
+        <a href="class-teacher.html" class="role-card reveal">
+          <span class="role-num">02 / Class</span>
+          <h3>Class Teacher</h3>
+          <p>Pull in every subject's totals, compute the broadsheet, class average, and final positions.</p>
+          <span class="role-arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-value">1224</span>
+          <span class="stat-label">Competition ranking</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">100%</span>
+          <span class="stat-label">Works offline</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">0</span>
+          <span class="stat-label">Spreadsheets needed</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="page-wrap">
+    <span>HELIXA</span>
+    <span>Local-first &middot; No account needed</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+  HELIXA.initChrome('home');
+  HELIXA.initScrollReveal();
+</script>
+</body>
+</html>
