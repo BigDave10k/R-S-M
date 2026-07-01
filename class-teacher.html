@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Class Teacher — MasterCast</title>
+<title>Class Teacher — HELIXA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -15,7 +15,7 @@
     <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
       <path class="strand" d="M9 4 L23 14 L9 18 L23 28"/>
     </svg>
-    MasterCast
+    HELIXA
   </a>
   <div class="nav-actions">
     <button class="theme-toggle" aria-label="Toggle theme">
@@ -180,7 +180,7 @@
 
 <footer>
   <div class="page-wrap">
-    <span>MasterCast</span>
+    <span>HELIXA</span>
     <span>Local-first &middot; No account needed</span>
   </div>
 </footer>
@@ -476,4 +476,90 @@ function drawPieChart(counts, boundaries) {
     if (count === total) {
       paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${b.color}"/>`;
     } else {
-      paths += `<path d="M${cx},${cy} L
+      paths += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc} 1 ${x2},${y2} Z" fill="${b.color}"/>`;
+    }
+
+    legendHtml += `
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem;">
+        <span style="width:12px;height:12px;background:${b.color};display:inline-block;flex-shrink:0;"></span>
+        <span>${b.label}</span>
+        <span class="text-secondary" style="font-family:var(--font-mono);">${count}</span>
+      </div>`;
+
+    startAngle = endAngle;
+  });
+
+  svg.innerHTML = paths;
+  legend.innerHTML = legendHtml;
+}
+
+function save() {
+  const data = compute();
+  if (!data) return;
+
+  const students = data.map((d, i) => {
+    const subjects = {};
+    subjectColumns.forEach(s => {
+      const input = d.tr.querySelector(`input[data-subject="${s}"]`);
+      subjects[s] = Number(input.value || 0);
+    });
+    return {
+      sno: i + 1,
+      name: d.name || `Student ${i + 1}`,
+      subjects,
+      total: d.rowTotal,
+      average: Number(d.average.toFixed(2)),
+      position: d.tr.querySelector('[data-field="position"]').textContent
+    };
+  });
+
+  const record = currentRecord || { id: HELIXA.uuid(), type: 'class' };
+  record.className = els.className.value.trim();
+  record.session = els.session.value.trim();
+  record.term = els.term.value;
+  record.subjectColumns = subjectColumns;
+  record.students = students;
+
+  HELIXA.saveRecord(record);
+  currentRecord = record;
+  HELIXA.showToast('Saved to History', 'success');
+}
+
+function resetAll() {
+  els.tableSection.style.display = 'none';
+  els.summarySection.style.display = 'none';
+  els.importCard.style.display = 'none';
+  els.manualSubjectsCard.style.display = 'none';
+  els.tableBody.innerHTML = '';
+  subjectColumns = [];
+  importedTotals = null;
+  currentRecord = null;
+  HELIXA.showToast('Sheet reset');
+}
+
+els.computeBtn.addEventListener('click', compute);
+els.saveBtn.addEventListener('click', save);
+els.resetBtn.addEventListener('click', resetAll);
+
+// Load from History
+const params = new URLSearchParams(window.location.search);
+const loadId = params.get('load');
+if (loadId) {
+  const rec = HELIXA.getRecord(loadId);
+  if (rec && rec.type === 'class') {
+    currentRecord = rec;
+    els.className.value = rec.className;
+    els.session.value = rec.session;
+    els.term.value = rec.term;
+    els.numStudents.value = rec.students.length;
+    subjectColumns = rec.subjectColumns || [];
+    const nameOrder = rec.students.map(s => s.name);
+    const studentMap = {};
+    rec.students.forEach(s => studentMap[s.name] = s.subjects);
+    buildTable(subjectColumns, nameOrder, studentMap);
+    compute();
+  }
+}
+</script>
+</body>
+</html>
